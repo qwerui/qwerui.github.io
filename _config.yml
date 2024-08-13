@@ -26,7 +26,6 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - ci.sh
-  - CODE_OF_CONDUCT.md
   - LICENSE
   - jekyll-rtd-theme.gemspec
   - images
