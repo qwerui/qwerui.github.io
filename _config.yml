@@ -1,5 +1,5 @@
 title: Qwerui's Blog
-lang: ko-KR
+lang: en-US
 description: Qwerui's Blog
 edit: false
 
@@ -28,4 +28,3 @@ exclude:
   - ci.sh
   - LICENSE
   - jekyll-rtd-theme.gemspec
-  - images
