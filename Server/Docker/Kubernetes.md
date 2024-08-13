@@ -1,0 +1,136 @@
+# Kubernetes
+
+## 개요
+컨테이너 시스템 전체를 통괄하고, 여러 개의 컨테이너를 관리하는 시스템, 여러 대의 컨테이너가 여러 대의 물리 서버에 걸쳐 실행되는 것을 전제로 한다. 소규모라도 관리의 자동화를 원한다면 고려해볼만하다.
+<br/>
+
+쿠버네티스는 YAML 파일에 컨테이너나 볼륨의 개수 등 환경을 설정해두고 자동으로 이 상태를 유지한다. 쿠버네티스가 관리하는 요소를 강제로 변경하는 것은 권장하지 않는다.
+
+## 클러스터
+- 마스터 노드 : 컨테이너의 전체적인 관리를 담당
++ kube-apiserver : 외부와 통신을 담당, kubectl로부터 명령을 받아 실행
++ kube-controller-manager : 컨트롤러를 통합, 관리
++ kube-scheduler : 파드를 워커 노드에 할당
++ cloud-controlelr-manager : 클라우드 서비스와 연동
++ etcd : 클러스터 관련 정보를 관리하는 데이터베이스
+- 워커 노드 : 실제 동작을 담당, 도커 등의 컨테이너 엔진이 필요
++ kube-let : kube-scheduler와 연동해 워커 노드에 파드를 배치하고 실행, 파드의 상태를 모니터링해 마스터로 전송
++ kube-proxy : 네트워크 통신 라우팅
+- 클러스터 : 마스터 노드 + 워커 노드
+
+## 쿠버네티스 리소스
+- 파드 : 컨테이너 + 볼륨
+- 서비스 : 파드의 집합을 관리, 주 역할은 로드 밸런싱
+- 레플리카 세트 : 파드의 수를 관리, 레플리카 세트가 관리하는 동일한 구성의 파드를 레플리카라고 부른다.
+- 디플로이먼트 : 배포 담당, 파드가 사용하는 이미지, 파드의 정보를 담고 있음
+- 파드 템플릿 : 배포 시 파드의 형틀
+- 레플리케이션 컨트롤러 : 레플리케이션 제어
+- 리소스쿼터 : 쿠버네티스 리소스 사용량 제한 설정
+- 비밀값 : 키 정보 관리
+- 서비스어카운트 : 리소스 사용자 관리
+- 데몬 세트 : 워커 노드마다 하나의 파드 생성
+- 스테이트풀 세트 : 파드의 배포 상태를 유지 및 관리
+- 크론잡 : 지정된 스케줄대로 파드를 실행
+- 잡 : 파드를 한 번 실행
+
+## 매니페스트 파일
+매니페스트 파일은 리소스 단위로 작성한다. 하나의 파일로 작성하고 싶다면 리소스 간 ---로 구분한다. 파드는 대체로 디플로이면트에 포함되는 형태로 기재된다.
+
+### 주 항목
+- apiversion : API 그룹 및 버전
+- kind : 리소스 유형
+- metadata : 메타데이터
++ name : 리소스 이름
++ namespace : 리소스를 세분화한 DNS 호환 레이블
++ uid : 유일 식별자
++ resourceVersion : 리소스 버전
++ generation : 생성 순서
++ creationTimestamp : 생성 일시
++ deletionTimestamp : 삭제 일시
++ labels : 임의의 레이블, 키-값 쌍
++ anotation : 리소스에 설정할 값
+- spec : 리소스 내용
+
+### 파드 작성
+```yaml
+apiVersion: v1
+kind: Pod
+metadata: # 파드 정보
+  name: some_pod
+  labels:
+    app: some_label
+spec:
+  containers: # 컨테이너 정보
+    - name: some_container
+      image: some_image
+      ports:
+      - containerPort: 80
+
+```
+
+### 디플로이먼트 작성
+```yaml
+apiVersion: /v1
+kind: Deployment
+metadata:
+  name: some_deployment
+spec:
+  selector: # 특정 레이블이 부여된 파드를 관리
+    matchLabels:
+      app: some_label
+  replicas: 5 # 파드의 개수
+  template: # 생성할 파드의 정보
+    metadata:
+      labels:
+        app: some_label
+    spec:
+      containers:
+      - name: some_pod
+        image: some_image
+        ports:
+        - containerPort: 80
+```
+
+### 서비스 작성
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: some_deployment
+spec:
+  type: NodePort # 서비스 유형
+  # ClusterIP : 클러스터 IP를 이용해 서비스에 접근(외부에서 접근 불가)
+  # NodePort : 워커 노드의 IP를 이용해 서비스에 접근
+  # LoadBalancer : 로드밸러서의 IP를 이용해 서비스에 접근
+  # ExternalName : 파드에서 서비스를 통해 외부로 나가기 위한 설정
+  ports:
+  - port: 8099 # 서비스의 포트
+    targetPort: 80 # 컨테이너 포트
+    protocol: TCP # 통신 프로토콜
+    nodePort: 30080 # 워커 노드의 포트 30000~32767 사이의 값
+  selector:
+    app: some_label # matchLabels를 사용해선 안된다
+```
+
+## 쿠버네티스 명령어
+kubectl 커맨드 옵션 형식을 사용한다.
+
+- create : 리소스 생성
+- edit : 리소스 편집
+- delete : 리소스 삭제
+- get : 리소스 상태 출력
+- set : 리소스 값 설정
+- apply : 리소스 변경 반영
+- describe : 상세 정보
+- diff : 이상적인 상태와 현재 상태 비교
+- expose : 파드의 부하를 분산하는 서비스 생성
+- scale : 레플리카 수 변경
+- autoscale : 자동 스케일링 적용
+- rollout : 롤아웃
+- exec : 컨테이너에서 명령 수행
+- run : 컨테이너에서 명령을 한 번 수행
+- attach : 컨테이너에 접속
+- cp : 컨테이너에 파일 복사
+- logs : 컨테이너 로그 출력
+- cluster-info : 클러스터 상세 정보
+- top : 시스템 자원 출력

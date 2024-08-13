@@ -1,11 +1,9 @@
-title: jekyll-rtd-theme
-lang: en-US
-description: Just another documentation theme compatible with GitHub Pages, based on sphinx_rtd_theme
+title: Qwerui's Blog
+lang: ko-KR
+description: Qwerui's Blog
+edit: false
 
-edit: true
-
-copyright:
-  revision: true
+copyright: false
 
 addons:
   - github
@@ -31,3 +29,4 @@ exclude:
   - CODE_OF_CONDUCT.md
   - LICENSE
   - jekyll-rtd-theme.gemspec
+  - images
