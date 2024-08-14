@@ -66,7 +66,62 @@ Vue.use(VueRouter);
 
 export default new VueRouter({
   mode: 'hash'
-
+  routes: [{
+    path: '/path',
+    component: component_object
+  }]
 })
+
+```
+
+## Slot
+```html
+<template>
+    <div>
+        <h3>Vue Slot</h3>
+        <div-comp>메시지입니다.</div-comp>
+        <i>
+            <div-comp>
+                <b>홍길동님 {{ message }}</b>
+            </div-comp>
+        </i>
+        <div-comp>
+            <ul-comp>
+                <template v-slot:header>헤더</template>
+                <template>바디</template>
+                <template #footer>푸터</template>
+            </ul-comp>
+        </div-comp>
+    </div>
+</template>
+
+<script>
+const DivComp = {
+    //slot : template을 template에게 넘기는 경우
+    template: `<div style="border:1px solid silver;"><slot>대체내용</slot></div>`,
+};
+
+const UlComp = {
+    template: `<ul>
+        <li><slot name="header"></slot></li>
+        <li><slot></slot></li>
+        <li><slot name="footer"></slot></li>
+        </ul>`,
+};
+
+export default {
+    data() {
+        return {
+            message: '안녕하세요',
+        };
+    },
+    components: {
+        DivComp,
+        UlComp,
+    },
+};
+</script>
+
+<style></style>
 
 ```
