@@ -80,3 +80,6 @@ g.dispose();
 File outputFile = new File(uploadDir, "T-"+uuidFileName);
 ImageIO.write(outputImage, fileExtension.substring(1), outputFile);
 ```
+
+## 배포 관련
+application.properties의 내용을 docker run -e로 덮어쓸수 있다. application.properties에 기재한 내용을 대문자로 바꾸고, .을 _로 바꾼다.
