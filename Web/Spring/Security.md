@@ -95,3 +95,114 @@ public String createJwt(String username, String role, Long expiredMs) {
 1. 로그인 성공 시 JWT를 발급해 헤더에 저장한다.
 2. 로그인 검증 필터 전에 토큰 검증 필터를 삽입한다.
 3. 토큰이 존재하고 만료되지 않았으면 SecurityContextHolder.getContext().setAuthentication()에 토큰의 인증정보를 저장한다. 정상적인 토큰으로 간주하고 로그인 검증 필터는 자동으로 통과한다.
+
+### RSA 기반 JWT
+```java
+@Configuration
+public class SecurityConfig {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+				// 소셜 로그인
+        http
+                .oauth2Login(oauth2->oauth2.successHandler(new OAuth2SuccessHandler()));
+
+        return http.build();
+    }
+
+    // JWT를 위한 비대칭 키 셋 생성, 인코딩, 디코딩에 사용
+    @Bean
+    public JWKSet generateKeySet() throws Exception{
+        var keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(2048);
+        var keyPair = keyPairGenerator.generateKeyPair();
+        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic(); // 공개 키 생성, Gateway에서 검증에 사용
+        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+
+        // JWK로 공개 키 변환
+        var rsaKey = new RSAKey.Builder(publicKey)
+                .privateKey(privateKey)
+                .keyID("1234")  // Key ID 설정 (JWT 헤더의 kid와 일치해야 함)
+                .build();
+
+        return new JWKSet(rsaKey);
+    }
+
+    // 인코더 생성
+    @Bean
+    public JwtEncoder jwtEncoder(JWKSet set) {
+        var source = new JWKSource<SecurityContext>() {
+            @Override
+            public List<JWK> get(JWKSelector jwkSelector, SecurityContext securityContext) throws KeySourceException {
+                return jwkSelector.select(set);
+            }
+        };
+
+        return new NimbusJwtEncoder(source);
+    }
+}
+```
+```java
+@Component
+@RequiredArgsConstructor
+public class JWTHandler {
+
+    private final JwtEncoder encoder;
+
+    @Value("${security.jwt.issuer}")
+    private String issuer;
+
+    public String createToken(String username){
+        Instant now = Instant.now();
+
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer(issuer)
+                .issuedAt(now)
+                .expiresAt(now.plusSeconds(3600)) // 1시간 유효
+                .subject(username)
+                .claim("role", "INVALID") // 역할 추가 (필요시 변경)
+                .build();
+
+        var params = JwtEncoderParameters.from(claims);
+
+        return encoder.encode(params).getTokenValue();
+    }
+
+    public void setJwtTokenAsCookie(String jwtToken, HttpServletResponse response) {
+        Cookie cookie = new Cookie("jwt_token", jwtToken);
+        cookie.setHttpOnly(true);  // HTTP Only 설정
+        cookie.setPath("/");  // 쿠키가 전송될 경로
+        cookie.setMaxAge(24 * 60 * 60);  // 쿠키 유효 기간 (24시간)
+        response.addCookie(cookie);
+    }
+}
+```
+```java
+@RestController
+@RequiredArgsConstructor
+public class JWTController {
+
+    private final JWKSet jwkSet;
+    private final JWTHandler jwtHandler;
+
+    @GetMapping("/.well-known/jwks.json") // 
+    public Map<String, Object> getJwks() {
+        // JWK Set을 반환
+        return jwkSet.toJSONObject();
+    }
+}
+```
+```java
+    @Bean
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+        http
+                .cors(cors->cors.configurationSource(corsConfigurationSource()))
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .authorizeExchange(exchanges -> exchanges
+                        .pathMatchers(HttpMethod.GET).permitAll() // GET 요청은 인증 불필요
+                        .anyExchange().authenticated() // 다른 모든 요청은 인증 필요
+                )
+                .oauth2ResourceServer(oauth2->oauth2.jwt(jwt->jwt.jwkSetUri(jwkSetUri))); // .well-known/jwks.json
+
+        return http.build();
+    }
+```

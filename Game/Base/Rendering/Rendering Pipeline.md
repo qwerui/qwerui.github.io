@@ -11,26 +11,38 @@
 크기는 회전의 영향을 받고, 회전은 이동의 영향을 받는다   
 정점의 행렬은 변환 행렬의 오른쪽에 붙는다
 ### 2차원
+
 **축소 확대**   
+
 $$
+
 \begin{align}
 \begin{pmatrix} s_x & 0 \\ 0 & s_y \end{pmatrix}{x \choose y} = {s_xx \choose s_yy} \\
 \begin{pmatrix} s_x & 0 & 0 \\ 0 & s_y & 0 \\ 0 & 0 & 1 \end{pmatrix}\begin{pmatrix} x \\ y \\ 1 \end{pmatrix} = \begin{pmatrix} s_xx \\ s_yy \\ 1 \end{pmatrix}
 \end{align}
+
 $$   
+
 **회전**   
+
 $$
+
 \begin{align}
 \begin{pmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{pmatrix}{x \choose y} = {x' \choose y'} \\
 \begin{pmatrix} \cos\theta & -\sin\theta & 0 \\ \sin\theta & \cos\theta & 0 \\ 0 & 0 & 1 \end{pmatrix}\begin{pmatrix} x \\ y \\ 1 \end{pmatrix} = \begin{pmatrix} x' \\ y' \\ 1 \end{pmatrix}
 \end{align}
+
 $$   
+
 **이동**   
+
 $$
+
 \begin{align}
 {x \choose y}+{d_x \choose d_y} = {x+d_x \choose y+d_y} \\
 \begin{pmatrix} 1 & 0 & d_x \\ 0 & 1 & d_y \\ 0 & 0 & 1 \end{pmatrix}\begin{pmatrix} x \\ y \\ 1 \end{pmatrix} = \begin{pmatrix} x+d_x \\ y+d_y \\ 1 \end{pmatrix}
 \end{align}
+
 $$   
 
 ### 3차원

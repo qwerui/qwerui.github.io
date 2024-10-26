@@ -57,14 +57,40 @@ apiVersion: v1
 kind: Pod
 metadata: # 파드 정보
   name: some_pod
-  labels:
+  labels: # 라벨, 객체에 연결할 수 있는 키값쌍
     app: some_label
 spec:
   containers: # 컨테이너 정보
     - name: some_container
       image: some_image
+      resources:
+        requests: # 최소 요구 자원
+          cpu: "500m" # CPU 자원의 50%, 1m당 1000분의 1
+          memory: "128Mi" # 요구 메모리
+        limits: # 최대 가용 자원
+          cpu: "1000m"
+          memory: "256Mi"
+      livenessProbe: # 활성 상태 검사, readinessProbe로 준비 프로프도 가능
+        httpGet: # GET 요청을 통한 검사, /healthy 경로 GET 요청 수행
+          path: /healthy
+          port: 8080
+        initialDelaySeconds: 5 # 5초 후 검사 수행
+        timeoutSeconds: 1 # 1초 이상 걸리면 실패
+        periodSeconds: 10 # 10초 마다 검사
+        failureThreshold: 3 # 3번 연속 실패시 중지 및 재시작
       ports:
       - containerPort: 80
+      volumeMounts:
+        - mountPath: "/data" # 컨테이너 내부 경로
+          name: "data"
+  volumes: # 볼륨 정의
+    - name: "data"
+      hostPath:
+        path: "/var/data" # 호스트 경로
+    - name: "remote-data"
+      nfs:
+        server: some-url
+        path: "/remote"
 
 ```
 
@@ -104,10 +130,10 @@ spec:
   # LoadBalancer : 로드밸러서의 IP를 이용해 서비스에 접근
   # ExternalName : 파드에서 서비스를 통해 외부로 나가기 위한 설정
   ports:
-  - port: 8099 # 서비스의 포트
+  - port: 8099 # 서비스의 포트, 클러스터 내부에 노출할 포트
     targetPort: 80 # 컨테이너 포트
     protocol: TCP # 통신 프로토콜
-    nodePort: 30080 # 워커 노드의 포트 30000~32767 사이의 값
+    nodePort: 30080 # 워커 노드의 포트 30000~32767 사이의 값, 클러스터 외부에 노출할 포트
   selector:
     app: some_label # matchLabels를 사용해선 안된다
 ```
@@ -134,3 +160,31 @@ kubectl 커맨드 옵션 형식을 사용한다.
 - logs : 컨테이너 로그 출력
 - cluster-info : 클러스터 상세 정보
 - top : 시스템 자원 출력
+- port-forward : 포트 포워딩
+- label : 객체 라벨링
+
+## 인그레스
+k8s의 HTTP 기반 로드밸런싱 시스템   
+[Document](https://kubernetes.io/ko/docs/concepts/services-networking/ingress/)
+
+### 예시
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minimal-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx-example
+  rules:
+  - http:
+      paths:
+      - path: /testpath
+        pathType: Prefix
+        backend:
+          service:
+            name: test
+            port:
+              number: 80
+```

@@ -28,6 +28,7 @@
 - volumes : 스토리지 마운트 지정
 - ports : 포트 지정
 - environment : 환경변수 설정
+- build : 이미지를 빌드할 폴더 지정
 - depends_on : 다른 서비스에 대한 의존 관계 정의
 - restart : 컨테이너 종료 시 재시작 여부
 + no : 재시작 하지 않음
