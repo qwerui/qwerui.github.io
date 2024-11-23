@@ -188,3 +188,38 @@ spec:
             port:
               number: 80
 ```
+
+## Docker desktop에서 k8s 대시보드 활성화(local)
+1. Docker desktop 설정에서 k8s 활성화
+2. kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.4.0/aio/deploy/recommended.yaml
+3. kubectl proxy
+4. 서비스 아카운트 생성
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin-user
+  namespace: kubernetes-dashboard
+```
+
+5. 서비스 아카운트에 역할 부여
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-user
+roleRef: # 부여할 역할
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin # 관리자 역할
+subjects: # 부여 대상
+- kind: ServiceAccount
+  name: admin-user
+  namespace: kubernetes-dashboard
+```
+
+6. kubectl -n kubernetes-dashboard create token admin-user
+7. http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/ 접속
+8. 6번의 토큰을 붙여넣고 사용
