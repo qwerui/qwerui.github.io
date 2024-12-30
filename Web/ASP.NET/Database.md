@@ -70,6 +70,13 @@ foreach (DataRow row in dataSet.Tables["테이블이름"].Rows)
 - 모듈러 모놀리식을 구축할 경우
 - 읽기 전용 복제본에 접근할 경우(NoTracking으로 성능 향상 가능)
 
+### DB에 변경 내용 반영
+```sh
+dotnet tool install --global dotnet-ef # dotnet ef 설치
+dotnet ef migrations add init # 마이그레이션 추가, 코드 변경 이후 사용, init은 이름이니 변경가능
+dotnet ef database update # 데이터베이스 생성
+```
+
 ### Model
 ```c#
 // 대체로 선언방법과 관계형성은 JPA와 비슷하다.
