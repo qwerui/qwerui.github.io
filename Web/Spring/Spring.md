@@ -4,6 +4,12 @@
 JAVA 환경 웹 어플리케이션 프레임워크, DI를 통해 IoC를 구현함으로써 의존성을 관리하기 용이하고, AOP를 이용해 메인 로직에 같이 사용되는 공통 로직들을 관리하기 용이하다.   
 어플리케이션에서 사용되는 객체들은 빈으로 불리며, 스프링 컨테이너에서 이 빈들의 생명주기와 의존성을 관리한다.
 
+## 설치(Eclipse)
+1. eclipse 2020-09 버전 이하를 사용한다.
+2. 마켓플레이스에서 sts3 add on을 설치한다.
+3. Preference의 Server에서 사용할 Tomcat을 지정한다. 이때 Tomcat은 9.0이하여야한다.
+4. Maven Repositories의 Global Repositories의 Central을 우클릭해서 Rebuild한다.
+
 ## IoC & DI
 - IoC : 제어의 역전
 - DI : 의존성 주입
