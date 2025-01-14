@@ -167,7 +167,7 @@ using (var context = new ApplicationDbContext())
     context.Products.Update(result);
     // Delete
     context.Products.Remove(result);
-    // DB에 반영
+    // DB에 반영, 암시적으로 트랜잭션을 수행한다.
     await context.SaveChangesAsync();
 
 }
