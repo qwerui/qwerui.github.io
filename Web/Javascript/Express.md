@@ -35,6 +35,7 @@ app.get('/', (req, res)=>{
     res.send('Hello World!');
 });
 
+// app.use만으로 로그를 찍어보면 2번 찍히는 경우가 있다. 원인은 브라우저가 favicon.ico를 같이 요청하기 때문. 이에 대한 처리도 당연히 필요하다.
 app.use((req, res)=>{
     res.status(404).send('File Not Found');
 })
