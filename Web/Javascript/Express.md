@@ -46,6 +46,22 @@ app.listen(port, ()=>{
 
 ```
 
+### 오류 처리
+```javascript
+app.use((req, res, next)=>{
+    throw new Error("에러 발생 시 에러 처리 코드가 받는다.");
+});
+
+app.use((req, res, next)=>{
+    next(new Error("이 방법도 가능하다"));
+});
+
+app.use((err, req, res, next)=>{
+    // 에러처리 코드
+    // 비즈니스로직을 작성하고 맨 마지막에 작성해야 오류처리가 가능하다.
+});
+```
+
 ### Router
 1. Router()를 이용해 라우터를 모듈로 만든다.
 2. 해당 모듈은 1차적으로 걸러진 라우터에서 일치하는 URL과 메소드에 따라 실행
