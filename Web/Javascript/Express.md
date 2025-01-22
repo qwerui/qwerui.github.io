@@ -97,3 +97,12 @@ module.exports = router;
 - json() : json형태로 데이터 응답
 - render() : 뷰 템플릿 엔진을 HTML로 렌더링
 - status() : 상태코드 변경
+
+### 주요 모듈
+[많이 사용하는 모듈](https://expressjs.com/ko/resources/middleware.html)
+
+- express-validator : querystring, body 유효성 검증
+- jsonwebtoken : JWT 생성 및 검증
+- pino, winston : 로깅
+- opossum : 서킷브레이커
+- bottleneck : API 요청 수 제한
