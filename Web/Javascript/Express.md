@@ -106,3 +106,4 @@ module.exports = router;
 - pino, winston : 로깅
 - opossum : 서킷브레이커
 - bottleneck : API 요청 수 제한
+- i18next : 다국어 처리
