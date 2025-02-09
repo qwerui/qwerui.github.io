@@ -78,6 +78,13 @@ SELECT는 가능하지만 DML은 불가능한 컬럼, 어느 테이블이던 사
 - SUM/AVG/STDDEV/VARIANCE : 합, 평균, 표준편차, 분산
 - MIN/MAX/COUNT : 최솟값, 최댓값, 개수
 - DISTINCT : 중복 제거
+- ROLLUP : 첫 번째 인수에 대한 소그룹 합계
+- CUBE : 모든 그룹별 합계
+- GROUPING SETS : 각각의 컬럼을 기준으로 GROUP BY 합계
+
+### 기타함수
+- DECODE : IF ELSE, DECODE(컬럼, [조건값, 반환값], ELSE값)
+- RANK, DENSE_RANK : 순위 반환 RANK는 중복 발생 시 동일 순위를 부여하고 그 개수만큼 순위를 건너뜀, DENSE_RANK는 건너뛰지 않음. RANK() OVER (ORDER BY [조건])으로 사용
 
 ## 조건부 표현식
 ```sql
@@ -101,4 +108,12 @@ WHEN MATCHED THEN
     조건 만족 시 수행할 구문
 WHEN NOT MATCHED THEN
     조건 불만족 시 수행할 구문
+```
+
+## 계층형 쿼리
+```sql
+SELECT LEVEL -- LEVEL이 계층 단계
+...
+START WITH [조건] -- 루트 지정
+CONNECT BY PRIOR [조건] -- 연결 지정
 ```
