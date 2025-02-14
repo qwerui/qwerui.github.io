@@ -12,3 +12,11 @@
 2. cors 설정에서 Credential을 포함해야한다.
 3. 3-tier-architecture에서 HTTPOnly, Secure, SameSite=none 설정 확인
 4. 로컬 개발 시 mkcert로 https 적용 확인 (검증 필요)
+```sh
+mkcert -key-file key.pem -cert-file cert.pem localhost 127.0.0.1 ::1
+# Node에서 UNABLE_TO_VERIFY_LEAF_SIGNATURE 오류 발생 시 (cmd)
+mkcert -CAROOT # mkcert의 루트 인증서 경로
+
+# 환경 변수에 추가
+set NODE_EXTRA_CA_CERTS=[루트 인증서 경로]\rootCA.pem
+```
