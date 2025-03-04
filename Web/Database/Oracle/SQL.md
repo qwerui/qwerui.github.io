@@ -11,7 +11,7 @@
 --SELECT, GROUP BY, HAVING은 처리 순서가 뒤바뀔 수 있다.
 SELECT      --5
 FROM        --1
-WHERE       --2
+WHERE       --2 NOT - AND - OR 순으로 연산
 GROUP BY    --3
 HAVING      --4
 ORDER BY    --6
@@ -85,6 +85,10 @@ SELECT는 가능하지만 DML은 불가능한 컬럼, 어느 테이블이던 사
 ### 기타함수
 - DECODE : IF ELSE, DECODE(컬럼, [조건값, 반환값], ELSE값)
 - RANK, DENSE_RANK : 순위 반환 RANK는 중복 발생 시 동일 순위를 부여하고 그 개수만큼 순위를 건너뜀, DENSE_RANK는 건너뛰지 않음. RANK() OVER (ORDER BY [조건])으로 사용
+- PARTITION BY : 컬럼으로 그룹화
+- OVER : 분석함수로 변환, GROUP BY 없이 통계함수를 사용할 수 있다. 결과는 각 행에 저장된다.
+- NTILE : 전체 결과를 N등분 후 각 결과에 순번 부여
+- LAG : N번째 이전 행 값을 가져옴
 
 ## 조건부 표현식
 ```sql
@@ -115,5 +119,5 @@ WHEN NOT MATCHED THEN
 SELECT LEVEL -- LEVEL이 계층 단계
 ...
 START WITH [조건] -- 루트 지정
-CONNECT BY PRIOR [조건] -- 연결 지정
+CONNECT BY PRIOR [조건] -- 연결 지정, PRIOR는 부모 행의 조건, 없으면 현재 행의 조건
 ```
