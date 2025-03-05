@@ -112,3 +112,55 @@ IOS : /var/moblie/Containers/Data/Application/[App Guid]/Library/UnityCache/Shar
 
 캐시는 번들파일 형태가 아닌 번들이 풀린형태로 저장된다.   
 PC의 경우 프로그램을 삭제할 때 이 캐시는 남아있는 경우가 있다.   
+
+### 설정
+
+- 폴더를 Addressable로 지정하면 하위 에셋이 전부 addressable로 된다.
+- 모바일 에셋 빌드는 에디터에서 호환되지 않을 수 있다. 아마 이거 때문에 에디터에서 다운로드가 안 된듯. 에디터에서 사용하려면 Windows로 하자.
+
+### 로드 방법 고찰
+
+1. 시작할 때 모든 에셋을 다운로드. 이는 카탈로그 기반으로 수행한다. **CheckForCatalogUpdates → UpdateCatalogs(반환되는 IResourceLocator에 Keys 필드를 이용, 모든 키를 따로 리스트에 AddRange로 담고 이후를 수행한다) → GetDownloadSizeAsync → DownloadDependenciesAsync**
+2. 이후 비동기 로드를 수행하더라도 이미 모두 다운로드 했기 때문에 로컬에서 불러온다.
+
+### 제외 대상
+
+- 인트로 씬에 사용되는 에셋들
+
+### 씬 관련
+
+씬이 어드레서블이던 아니던 커스텀 컴포넌트에는 AssetReference를 사용해야한다. 씬이 어드레서블인 경우 Image의 Sprite 같이 유니티 기본 컴포넌트의 요소에 할당한 에셋이 어드레서블일 때 번들에서 로드하게된다.
+
+- 일반 씬 + 컴포넌트에 일반 에셋 = 빌드 파일에 패킹
+- 일반 씬 + 컴포넌트에 어드레서블 에셋 = 빌드 파일에 사본 패킹
+- 어드레서블 씬 + 컴포넌트에 어드레서블 에셋 = 종속관계에 따른 번들 사용
+- 어드레서블 씬 + 컴포넌트에 일반 에셋 = 어드레서블 씬 그룹에 일반 에셋의 사본이 패킹
+
+LoadAssetAsync의 결과가 SO인 경우 이 SO를 직접 수정하고 Release해도 모든 씬에서 유지된다. 그룹 별로 중복된 곳이 있다면 문제가 생길 수 있지만 이벤트 SO는 공통 그룹으로 따로 빼고 쓰는 것이 일반적.
+
+### 커스텀 에셋 레퍼런스
+
+AssetReference를 사용하지 않으면 메모리 추적이 안된다. Addressable을 사용하다보면 반드시 커스텀해야할 상황이 생길것이다.
+
+```csharp
+// 기본지원
+// 미리 정의된 GameObject를 제외하고 Instantiate가 없다.
+[Serializable]
+public class TReference : AssetReferenceT<T>
+{
+    public SpawnReference(string guid) : base(guid) { }
+}
+
+// Instantiate가 있다. 반환은 T로 된다.
+// Sample에서 다운로드 가능
+[Serializable]
+public class CompReference : ComponentReference<T>
+{
+    public CompReference(string guid) : base(guid) { }
+}
+```
+
+### 그룹 구조
+
+- 기본적으로 씬 단위로
+- 여러 씬에서 사용되는 것들은 공유 에셋 그룹을 생성한다.
