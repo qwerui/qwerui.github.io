@@ -206,3 +206,42 @@ public class JWTController {
         return http.build();
     }
 ```
+
+## Jasypt
+[github 출처](https://github.com/ulisesbocchio/jasypt-spring-boot/tree/master)
+<br/>
+
+application.yml에 사용되는 키들을 암호화할 수 있다.
+```xml
+<dependency>
+        <groupId>com.github.ulisesbocchio</groupId>
+        <artifactId>jasypt-spring-boot-starter</artifactId>
+        <version>3.0.5</version>
+</dependency>
+```
+```java
+@Bean("jasyptStringEncryptor")
+    public StringEncryptor stringEncryptor() {
+        PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
+        SimpleStringPBEConfig config = new SimpleStringPBEConfig();
+        config.setPassword([패스워드 키]);
+        config.setAlgorithm("PBEWITHHMACSHA512ANDAES_256");
+        config.setKeyObtentionIterations("1000");
+        config.setPoolSize("1");
+        config.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator");
+        config.setIvGeneratorClassName("org.jasypt.iv.RandomIvGenerator");
+        config.setStringOutputType("base64");
+        encryptor.setConfig(config);
+        return encryptor;
+    }
+/*
+이후 application.yml에서 값을 EUC(암호화된 값)으로 사용하면 된다.
+암호화는 jasyptEncrypt 메소드나 암호화 사이트에서 암호화가 가능하다.
+EUC부분은 application.yml에서 설정 가능하다.
+jasypt:
+  encryptor:
+    property:
+      prefix: "ENC@["
+      suffix: "]"
+*/
+```
