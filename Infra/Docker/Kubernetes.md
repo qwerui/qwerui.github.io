@@ -15,6 +15,7 @@ sudo sed -i '/swap/s/^/#/' /etc/fstab
 ```
 
 2. 방화벽 설정
+
 |노드|포트|프로토콜|설명|
 |---|---|---|---|
 |Master|6443|TCP|API 서버, 외부통신 시 사용|
@@ -49,6 +50,7 @@ sudo sysctl --system
 
 4. docker 설치
 5. docker cri 설정
+
 ```sh
 cat <<EOF | sudo tee /etc/docker/daemon.json
 {
@@ -64,6 +66,7 @@ EOF
 sudo systemctl restart docker
 ```
 6. cgroup 설정
+
 ```sh
 sudo mkdir -p /etc/containerd
 sudo containerd config default | sudo tee /etc/containerd/config.toml
@@ -75,21 +78,26 @@ sudo systemctl restart containerd
 
 7. kubelet kubeadm kubectl 설치
 8. 마스터 노드 초기화
+
 ```sh
 sudo kubeadm init
 ```
+
 9. 일반 사용자 kubectl 활성화
+
 ```sh
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 10. Pod 네트워크 설정
+
 ```sh
 # Flannel
 kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
 ```
 11. 워커 노드 등록
+
 ```sh
 kubeadm join <마스터노드 IP>:<마스터노드 포트(6443)> --token <토큰> --discovery-token-ca-cert-hash sha256:<해시값>
 ```
