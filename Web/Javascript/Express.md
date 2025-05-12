@@ -107,3 +107,6 @@ module.exports = router;
 - opossum : 서킷브레이커
 - bottleneck : API 요청 수 제한
 - i18next : 다국어 처리
+
+## 성능 테스트
+K6 사용
