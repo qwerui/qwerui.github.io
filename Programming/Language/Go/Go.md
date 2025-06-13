@@ -13,6 +13,26 @@ go mod init [모듈명]
 # 빌드
 go build
 
+# object 파일 삭제
+go clean
+
+# 패키지 문서 출력
+go doc [패키지]
+
+# 환경 변수 출력
+go env
+
+# 소스 코드 포맷
+go fmt
+
+# 패키지 다운로드 및 추가
+go get [패키지]
+
+# 패키지 목록 출력
+go list
+
+# 컴파일 후 실행
+go run
 ```
 
 ## 기본 문법
