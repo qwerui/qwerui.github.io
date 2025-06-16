@@ -173,3 +173,66 @@ slice4 := array[1:3] // {2, 3, 4}
 
 
 ```
+
+## 테스트
+
+```go
+
+// 아래와 같은 형식 작성 후
+// go test .
+
+
+package main
+
+import "testing"
+
+// stretchr/testify = 테스트 작성 도구 패키지
+
+func TestAdd(t *testing.T) {
+    rst := Add(1, 2)
+    if rst != 3 {
+        t.Fail("Fail은 계속 진행")
+        t.Error("Error는 중단")
+    }
+}
+
+// go test -bench . (벤치마크)
+func BenchmarkAdd(b *testing.B){
+    for i := 0; i < b.N; i++ {
+        Add(1, 2)
+    }
+}
+
+```
+
+## 프로파일링
+
+```go
+
+// 아래와 같은 형식 작성 후
+// go tool pprof profile.prof
+
+package main
+
+import (
+    "log"
+    "os"
+    "runtime/pprof"
+)
+
+func main(){
+    f, err := os.Create("profile.prof")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer f.Close()
+    err = pprof.StartCPUProfile(f)
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer pprof.StopCPUProfile()
+}
+
+
+
+```
