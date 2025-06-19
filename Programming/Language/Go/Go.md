@@ -113,7 +113,7 @@ func main() {
 
 }
 
-// 함수 형식 (반환값 타입이 메소드명 뒤에 붙음)
+// 함수 형식 (반환값 타입이 함수명 뒤에 붙음)
 func Add(a int, b int) int {
     return a + b;
 }
@@ -123,6 +123,12 @@ type Student struct {
     Name string
     Class string
     Age int
+}
+
+// 메소드
+// stu.changeClass(class)로 사용가능
+func (stu *Student) changeClass(newClass string) {
+    stu.Class = newClass
 }
 
 // 인터페이스
